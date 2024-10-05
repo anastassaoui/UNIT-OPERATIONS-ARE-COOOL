@@ -1,412 +1,270 @@
 import streamlit as st
+import numpy as np
+import plotly.graph_objs as go
+from scipy.integrate import odeint
 
 
-tailwind_cdn = """
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Center the table header and cell content */
-        .css-1q8dd3e.e1ewe7hr3 th, .css-1q8dd3e.e1ewe7hr3 td {
-            text-align: center !important;
-        }
-    </style>
-"""
-st.markdown(tailwind_cdn, unsafe_allow_html=True)
+
+
+
+st.set_page_config(page_title="Absence Management Dashboard", layout="wide")
+
+
+st.title("Chemical Kinetics and Fick's Second Law")
+
 st.markdown("""
-    <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 md:-mb-12">          
-    <h1 class="text-3xl  text-center font-extrabold mt-10 
-                cursor-pointer md:text-7xl md:font-extrabold
-                mb-10 hover:text-blue-400 duration-1000
-                ">
-                 Solution to the Differential Equation for Diffusion with Reaction BY
-                <span class="bg-blue-100 text-blue-800 md:text-5xl mt-2 text-xl font-serif me-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ms-2
-                hover:scale-125">
-                    TASSAOUI 
-                </span>
-    </h1>
-    <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 md:-mt-7">
+### Fick's Second Law
 
-    
-""", unsafe_allow_html=True)
+Fick's Second Law describes diffusion and is given by:
 
+""")
+st.latex(r"""
+\frac{\partial C}{\partial t} = D \frac{\partial^2 C}{\partial x^2}
+""")
+st.markdown("""
+Where:
+- \( C \) is the concentration,
+- \( t \) is time,
+- \( D \) is the diffusion coefficient,
+- \( x \) is the spatial coordinate.
+""")
 
+st.markdown("""
+### Reaction Orders
 
+The rate of a chemical reaction can depend on the concentration of reactants in different ways, known as reaction orders.
 
-## Display Table of Contents
-#st.markdown("""
-#**Table of Contents:**
-#1. First-Order Reaction
-#    - Differential Equation
-#    - Simplified Equation and Boundary Conditions
-#    - Solution of the Differential Equation
-#2. Second-Order Reaction
-#    - Formulation of the Problem
-#    - Solution Approach
-#    - Characteristic Equation
-#    - General Solution
-#    - Applying Boundary Conditions
-#    - Solving the Coefficients
-#3. Third-Order Reaction
-#    - Formulation of the Problem
-#    - Solution Approach
-#    - Attempted Analytical Solution
-#    - Boundary Conditions
-#    - Solving the Coefficients
-#""")
+**First-Order Reactions:**
 
-# First-Order Reaction
-st.header('Chapter 1: First-Order Reaction')
+Rate law:
+""")
+st.latex(r"""
+\text{Rate} = -\frac{d[A]}{dt} = k[A]
+""")
 
-# Differential Equation
-st.subheader('Differential Equation')
-st.latex(r'D_A \frac{d^2 C_A}{dx^2} - r_a = 0')
-st.write('In this equation:')
-st.markdown(r'''
-- \( D_A \) is the diffusion coefficient of species \( A \),
-- \( C_A \) is the concentration of species \( A \) as a function of position \( x \),
-- \( r_a \) is the reaction rate term, which in this case, depends on \( C_A \) linearly (first-order reaction).
-''', unsafe_allow_html=True)
+st.markdown("""
+Differential equation:
+""")
+st.latex(r"""
+\frac{d[A]}{dt} = -k[A]
+""")
 
+st.markdown("""
+**Second-Order Reactions:**
 
+Rate law:
+""")
+st.latex(r"""
+\text{Rate} = -\frac{d[A]}{dt} = k[A]^2
+""")
 
-st.write('For a first-order reaction, \( r_a \) can be expressed as \( k C_A \), where \( k \) is the rate constant. Therefore, the equation becomes:')
-st.latex(r'D_A \frac{d^2 C_A}{dx^2} - k C_A = 0')
+st.markdown("""
+Differential equation:
+""")
+st.latex(r"""
+\frac{d[A]}{dt} = -k[A]^2
+""")
 
-# Simplified Equation and Boundary Conditions
-st.subheader('Simplified Equation and Boundary Conditions')
-st.write('The simplified differential equation is:')
-st.latex(r'D_A \frac{d^2 C_A}{dx^2} - k C_A = 0')
-st.write('The boundary conditions are:')
-st.latex(r'C_A(0) = C_A^i \quad \text{and} \quad C_A(\delta) = C_A^L')
-st.write('''
-- \( C_A(0) = C_A^i \): the concentration at \( x = 0 \) is \( C_A^i \),
-- \( C_A(\delta) = C_A^L \): the concentration at \( x = \delta \) is \( C_A^L \), where \( \delta \) is the thickness or length of the diffusion region.
-''')
+def first_order(C, t, k):
+    return -k * C
 
-# Solution of the Differential Equation
-st.subheader('Solution of the Differential Equation')
-st.write('We start by proposing a general solution of the form:')
-st.latex(r'C_A(x) = e^{mx}')
-st.write('Substituting this proposed solution into the differential equation:')
-st.latex(r'D_A m^2 e^{mx} - k e^{mx} = 0')
-st.write('We can factor out the exponential term:')
-st.latex(r'e^{mx} (D_A m^2 - k) = 0')
+def second_order(C, t, k):
+    return -k * C**2
 
-st.write('Since \( e^{mx} \neq 0 \), the equation simplifies to:')
-st.latex(r'D_A m^2 - k = 0')
-st.write('Solving for \( m \):')
-st.latex(r'm^2 = \frac{k}{D_A} \quad \Rightarrow \quad m = \pm \sqrt{\frac{k}{D_A}}')
+st.sidebar.title("Parameters")
 
-st.write('Thus, the general solution to the differential equation is:')
-st.latex(r'C_A(x) = A e^{\sqrt{\frac{k}{D_A}} x} + B e^{-\sqrt{\frac{k}{D_A}} x}')
+reaction_order = st.sidebar.selectbox(
+    "Select Reaction Order",
+    ("First Order", "Second Order"),
+    key='reaction_order_extended'
+)
 
-# Applying the Boundary Conditions
-st.subheader('Applying the Boundary Conditions')
-st.write('Now, we apply the boundary conditions to solve for the constants \( A \) and \( B \).')
+k = st.sidebar.slider("Rate Constant (k)", min_value=0.0, max_value=20.0, value=1.0)
+C0 = st.sidebar.slider("Initial Concentration (C₀)", min_value=0.0, max_value=20.0, value=1.0)
+time_max = st.sidebar.slider("Maximum Time", min_value=1, max_value=100, value=50)
 
-st.write('1. At \( x = 0 \), we know:')
-st.latex(r'C_A(0) = A + B = C_A^i')
+t = np.linspace(0, time_max, 500)
 
-st.write('2. At \( x = \delta \), we know:')
-st.latex(r'C_A(\delta) = A e^{\sqrt{\frac{k}{D_A}} \delta} + B e^{-\sqrt{\frac{k}{D_A}} \delta} = C_A^L')
+if reaction_order == "First Order":
+    C = odeint(first_order, C0, t, args=(k,))
+elif reaction_order == "Second Order":
+    C = odeint(second_order, C0, t, args=(k,))
 
-st.write('We now have a system of two equations:')
-st.latex(r'''
-\begin{align*}
-A + B &= C_A^i \\
-A e^{\sqrt{\frac{k}{D_A}} \delta} + B e^{-\sqrt{\frac{k}{D_A}} \delta} &= C_A^L
-\end{align*}
-''')
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=C[:, 0], mode='lines', name='Concentration'))
 
-# Solving for A and B
-st.subheader('Solving for \( A \) and \( B \)')
-st.write('Let’s solve for \( A \) and \( B \) step by step:')
-st.write('From the first equation:')
-st.latex(r'B = C_A^i - A')
+fig.update_layout(
+    title='Concentration vs. Time',
+    xaxis_title='Time',
+    yaxis_title='Concentration',
+    template='plotly_dark'
+)
 
-st.write('Substitute \( B = C_A^i - A \) into the second equation:')
-st.latex(r'''
-A e^{\sqrt{\frac{k}{D_A}} \delta} + (C_A^i - A) e^{-\sqrt{\frac{k}{D_A}} \delta} = C_A^L
-''')
+st.plotly_chart(fig)
 
-st.write('Simplify:')
-st.latex(r'''
-A \left( e^{\sqrt{\frac{k}{D_A}} \delta} - e^{-\sqrt{\frac{k}{D_A}} \delta} \right) + C_A^i e^{-\sqrt{\frac{k}{D_A}} \delta} = C_A^L
-''')
+st.markdown("### Effect of Doubling the Initial Concentration")
 
-st.write('Using the identity \( e^a - e^{-a} = 2\sinh(a) \), we get:')
-st.latex(r'''
-A \cdot 2\sinh\left( \sqrt{\frac{k}{D_A}} \delta \right) + C_A^i e^{-\sqrt{\frac{k}{D_A}} \delta} = C_A^L
-''')
+C0_doubled = 2 * C0
 
-st.write('Now solve for \( A \):')
-st.latex(r'''
-A = \frac{C_A^L - C_A^i e^{-\sqrt{\frac{k}{D_A}} \delta}}{2\sinh\left( \sqrt{\frac{k}{D_A}} \delta \right)}
-''')
+if reaction_order == "First Order":
+    C_doubled = odeint(first_order, C0_doubled, t, args=(k,))
+elif reaction_order == "Second Order":
+    C_doubled = odeint(second_order, C0_doubled, t, args=(k,))
 
-st.write('Finally, substitute this value of \( A \) back into the equation \( B = C_A^i - A \) to get \( B \).')
+fig2 = go.Figure()
+fig2.add_trace(go.Scatter(x=t, y=C[:, 0], mode='lines', name=f'C₀ = {C0}'))
+fig2.add_trace(go.Scatter(x=t, y=C_doubled[:, 0], mode='lines', name=f'C₀ = {C0_doubled}'))
 
-st.write('This completes the solution for the concentration profile \( C_A(x) \) in a first-order reaction.')
+fig2.update_layout(
+    title='Effect of Doubling Initial Concentration',
+    xaxis_title='Time',
+    yaxis_title='Concentration',
+    template='plotly_dark'
+)
 
-# Final solution expression
-st.subheader('Final Solution for \( C_A(x) \)')
-st.write('Thus, the concentration profile is given by:')
-st.latex(r'''
-C_A(x) = A e^{\sqrt{\frac{k}{D_A}} x} + B e^{-\sqrt{\frac{k}{D_A}} x}
-''')
-
-# Title of the Streamlit app
-st.title('Final Solution to the Concentration Profile')
-
-# Display the final equation for the concentration profile
-st.write('The final expression for the concentration profile \( C_A(x) \) is:')
-
-st.latex(r'''
-C_A(x) = C_A^i \frac{\sinh\left( \sqrt{\frac{k}{D_A}} (\delta - x) \right)}{\sinh\left( \sqrt{\frac{k}{D_A}} \delta \right)} + C_A^L \frac{\sinh\left( \sqrt{\frac{k}{D_A}} x \right)}{\sinh\left( \sqrt{\frac{k}{D_A}} \delta \right)}
-''')
-
-st.write('Where:')
-st.markdown(r'''
-- \( C_A^i \) is the initial concentration at \( x = 0 \),
-- \( C_A^L \) is the concentration at \( x = \delta \),
-- \( D_A \) is the diffusion coefficient,
-- \( k \) is the reaction rate constant,
-- \( \delta \) is the diffusion layer thickness.
-''')
-
-# Conclusion or any additional explanation
-st.write('This equation gives the concentration profile for a first-order reaction with diffusion as a function of position \( x \) within the layer of thickness \( \delta \).')
+st.plotly_chart(fig2)
 
 
 
+st.title("Chemical Kinetics and Fick's Second Law with Reaction")
+
+st.markdown("""
+### Fick's Second Law with Reaction Term
+
+When considering a reaction, Fick's Second Law becomes:
+
+""")
+st.latex(r"""
+\frac{\partial C}{\partial t} = D \frac{\partial^2 C}{\partial x^2} - R(C)
+""")
+st.markdown("""
+Where:
+- \( D \) is the diffusion coefficient,
+- \( R(C) \) is the reaction rate, which depends on the concentration \( C \).
+""")
+
+st.markdown("""
+### Reaction Orders
+
+**First-Order Reaction:**
+""")
+st.latex(r"""
+R(C) = k C
+""")
+st.markdown("""
+Thus:
+""")
+st.latex(r"""
+\frac{\partial C}{\partial t} = D \frac{\partial^2 C}{\partial x^2} - k C
+""")
+
+st.markdown("""
+**Second-Order Reaction:**
+""")
+st.latex(r"""
+R(C) = k C^2
+""")
+st.markdown("""
+Thus:
+""")
+st.latex(r"""
+\frac{\partial C}{\partial t} = D \frac{\partial^2 C}{\partial x^2} - k C^2
+""")
+
+st.markdown("""
+### The Hatta Number (Ha)
+
+The Hatta Number characterizes the relative rates of reaction and diffusion:
+
+""")
+st.latex(r"""
+\text{Ha} = \frac{k C_0 L}{D}
+""")
+st.markdown("""
+- **\( k \)**: Reaction rate constant
+- **\( C_0 \)**: Initial concentration
+- **\( L \)**: Characteristic length
+- **\( D \)**: Diffusion coefficient
+
+- **Ha << 1**: Reaction is slow compared to diffusion.
+- **Ha >> 1**: Reaction is fast compared to diffusion.
+""")
+
+def reaction_term(Ci, k, order):
+    if order == 1:
+        return k * Ci
+    elif order == 2:
+        return k * Ci**2
+    else:
+        return 0
+
+st.sidebar.title("Parameters")
+
+reaction_order = st.sidebar.selectbox(
+    "Select Reaction Order",
+    ("First Order", "Second Order"),
+    key='reaction_order_initial'    
+)
+
+D = st.sidebar.slider("Diffusion Coefficient (D)", min_value=0.1, max_value=10.0, value=1.0)
+k = st.sidebar.slider("Reaction Rate Constant (k)", min_value=0.0, max_value=10.0, value=1.0)
+C0 = st.sidebar.slider("Initial Concentration (C₀)", min_value=0.1, max_value=10.0, value=1.0)
+L = st.sidebar.slider("Length of the Domain (L)", min_value=1.0, max_value=10.0, value=1.0)
+N = st.sidebar.slider("Number of Spatial Points (N)", min_value=10, max_value=500, value=100)
+time_max = st.sidebar.slider("Maximum Time", min_value=1, max_value=100, value=10)
+
+Ha = (k * C0 * L) / D
+st.sidebar.markdown(f"**Hatta Number (Ha):** {Ha:.2f}")
+
+# Spatial discretization
+x = np.linspace(0, L, N)
+dx = x[1] - x[0]
+
+# Time discretization
+dt = 0.9 * dx**2 / (2 * D)  # Stability condition
+time_steps = int(time_max / dt)
+t = np.linspace(0, time_max, time_steps)
+
+# Initial concentration profile
+C = np.zeros((time_steps, N))
+C[0, :] = C0  # Initial condition
+
+# Boundary conditions (Dirichlet conditions)
+C[:, 0] = C0  # Left boundary
+C[:, -1] = C0  # Right boundary
+
+# Time-stepping loop
+for n in range(0, time_steps - 1):
+    for i in range(1, N - 1):
+        # Diffusion term
+        diffusion = D * (C[n, i+1] - 2 * C[n, i] + C[n, i-1]) / dx**2
+        # Reaction term
+        if reaction_order == "First Order":
+            reaction = -reaction_term(C[n, i], k, 1)
+        elif reaction_order == "Second Order":
+            reaction = -reaction_term(C[n, i], k, 2)
+        else:
+            reaction = 0
+        # Update concentration
+        C[n+1, i] = C[n, i] + dt * (diffusion + reaction)
+
+# Select times to plot
+plot_times = [0, int(0.25 * time_steps), int(0.5 * time_steps), int(0.75 * time_steps), time_steps - 1]
+labels = ['t = 0', 't = 0.25 t_max', 't = 0.5 t_max', 't = 0.75 t_max', 't = t_max']
+
+fig3 = go.Figure()
+
+for idx, pt in enumerate(plot_times):
+    fig3.add_trace(go.Scatter(x=x, y=C[pt, :], mode='lines', name=labels[idx]))
+
+fig3.update_layout(
+    title='Concentration Profile over Distance at Different Times',
+    xaxis_title='Distance (x)',
+    yaxis_title='Concentration (C)',
+    template='plotly_dark'
+)
+
+st.plotly_chart(fig3)
 
 
 
-
-
-
-
-
-
-
-
-
-## Second-Order Reaction
-#st.header('Chapter 2: Second-Order Reaction')
-#
-## Formulation of the Problem
-#st.subheader('Formulation of the Problem')
-#st.write('Assume the reaction rate \( r_a \) for a second-order reaction is given by:')
-#st.latex(r'r_a = k_2 C_R C_A')
-#st.write('Where:')
-#st.write('''
-#- \( k_2 \) is the second-order rate constant,
-#- \( C_R \) is the concentration of reactant \( R \),
-#- \( C_A \) is the concentration of species \( A \).
-#''')
-#
-#st.write('Since \( C_R \) is in excess and treated as a constant, we can simplify the reaction rate to a pseudo-first-order form:')
-#st.latex(r'r_a = k^{\prime} C_A \quad \text{where} \quad k^{\prime} = k_2 C_R')
-#
-#st.write('Thus, the differential equation governing the system becomes:')
-#st.latex(r'D_A \frac{d^2 C_A}{dx^2} - k^{\prime} C_A = 0')
-#st.write('Where:')
-#st.write('''
-#- \( D_A \) is the diffusion coefficient of species \( A \),
-#- \( C_A \) is the concentration of species \( A \) as a function of position \( x \),
-#- \( k^{\prime} \) is the pseudo-first-order rate constant.
-#''')
-#
-## Solution Approach
-#st.subheader('Solution Approach')
-#st.write('To solve this second-order differential equation, we propose a general solution of the form:')
-#st.latex(r'C_A(x) = A e^{mx} + B e^{-mx}')
-#st.write('Substituting this proposed solution into the differential equation:')
-#st.latex(r'D_A m^2 e^{mx} + D_A m^2 e^{-mx} - k^{\prime} A e^{mx} - k^{\prime} B e^{-mx} = 0')
-#
-#st.write('Factor out the exponential terms:')
-#st.latex(r'e^{mx} (D_A m^2 - k^{\prime}) + e^{-mx} (D_A m^2 - k^{\prime}) = 0')
-#
-#st.write('For this equation to hold true for all \( x \), each term must independently equal zero. Therefore:')
-#st.latex(r'D_A m^2 - k^{\prime} = 0')
-#
-#st.write('Solving for \( m \):')
-#st.latex(r'm^2 = \frac{k^{\prime}}{D_A} \quad \Rightarrow \quad m = \pm \sqrt{\frac{k^{\prime}}{D_A}}')
-#
-## General Solution
-#st.subheader('General Solution')
-#st.write('Thus, the general solution to the differential equation is:')
-#st.latex(r'C_A(x) = A e^{\sqrt{\frac{k^{\prime}}{D_A}} x} + B e^{-\sqrt{\frac{k^{\prime}}{D_A}} x}')
-#
-## Applying Boundary Conditions
-#st.subheader('Applying the Boundary Conditions')
-#st.write('Next, we apply the boundary conditions to solve for the constants \( A \) and \( B \).')
-#
-#st.write('1. At \( x = 0 \), the concentration is:')
-#st.latex(r'C_A(0) = C_A^i = A + B')
-#
-#st.write('2. At \( x = \delta \), the concentration is:')
-#st.latex(r'C_A(\delta) = A e^{\sqrt{\frac{k^{\prime}}{D_A}} \delta} + B e^{-\sqrt{\frac{k^{\prime}}{D_A}} \delta} = C_A^L')
-#
-#st.write('These two boundary conditions give us the following system of equations:')
-#st.latex(r'''
-#\begin{align*}
-#A + B &= C_A^i \\
-#A e^{\sqrt{\frac{k^{\prime}}{D_A}} \delta} + B e^{-\sqrt{\frac{k^{\prime}}{D_A}} \delta} &= C_A^L
-#\end{align*}
-#''')
-#
-## Solving for A and B
-#st.subheader('Solving for \( A \) and \( B \)')
-#st.write('Let’s solve for \( A \) and \( B \) step by step.')
-#
-#st.write('From the first equation:')
-#st.latex(r'B = C_A^i - A')
-#
-#st.write('Substitute this into the second equation:')
-#st.latex(r'''
-#A e^{\sqrt{\frac{k^{\prime}}{D_A}} \delta} + (C_A^i - A) e^{-\sqrt{\frac{k^{\prime}}{D_A}} \delta} = C_A^L
-#''')
-#
-#st.write('Simplify the equation:')
-#st.latex(r'''
-#A \left( e^{\sqrt{\frac{k^{\prime}}{D_A}} \delta} - e^{-\sqrt{\frac{k^{\prime}}{D_A}} \delta} \right) + C_A^i e^{-\sqrt{\frac{k^{\prime}}{D_A}} \delta} = C_A^L
-#''')
-#
-#st.write('Using the identity \( e^a - e^{-a} = 2\sinh(a) \), we get:')
-#st.latex(r'''
-#A \cdot 2\sinh\left( \sqrt{\frac{k^{\prime}}{D_A}} \delta \right) + C_A^i e^{-\sqrt{\frac{k^{\prime}}{D_A}} \delta} = C_A^L
-#''')
-#
-#st.write('Now solve for \( A \):')
-#st.latex(r'''
-#A = \frac{C_A^L - C_A^i e^{-\sqrt{\frac{k^{\prime}}{D_A}} \delta}}{2\sinh\left( \sqrt{\frac{k^{\prime}}{D_A}} \delta \right)}
-#''')
-#
-#st.write('Substitute \( A \) back into the equation \( B = C_A^i - A \) to get \( B \):')
-#st.latex(r'B = C_A^i - A')
-#
-## Final solution expression
-#st.subheader('Final Solution for \( C_A(x) \)')
-#st.write('Thus, the concentration profile is given by:')
-#st.latex(r'''
-#C_A(x) = A e^{\sqrt{\frac{k^{\prime}}{D_A}} x} + B e^{-\sqrt{\frac{k^{\prime}}{D_A}} x}
-#''')
-#
-## Third-Order Reaction
-#st.header('Chapter 3: Third-Order Reaction')
-#
-## Formulation of the Problem
-#st.subheader('Formulation of the Problem')
-#st.write('For a third-order reaction, the rate equation is:')
-#st.latex(r'r_a = k_3 C_A^2 C_R')
-#st.write('Assuming \( C_R \) is constant, we simplify to:')
-#st.latex(r'r_a = k^{\prime} C_A^2 \quad \text{where} \quad k^{\prime} = k_3 C_R')
-#st.write('The differential equation then becomes:')
-#st.latex(r'D_A \frac{d^2 C_A}{dx^2} - k^{\prime} C_A^2 = 0')
-#
-## Attempted Analytical Solution
-#st.subheader('Attempted Analytical Solution')
-#st.write('We attempt a solution of the form:')
-#st.latex(r'C_A(x) = \frac{1}{(A x + B)^2}')
-#st.write('Substituting into the differential equation yields:')
-#st.latex(r'D_A \frac{6A^2}{(A x + B)^4} - k^{\prime} \frac{1}{(A x + B)^4} = 0')
-#st.latex(r'6A^2 D_A - k^{\prime} = 0 \quad \Rightarrow \quad A^2 = \frac{k^{\prime}}{6D_A}')
-#
-## Boundary Conditions
-#st.subheader('Boundary Conditions')
-#st.write('We apply the boundary conditions:')
-#st.latex(r'C_A(0) = C_A^i = \frac{1}{B^2}')
-#st.latex(r'C_A(\delta) = C_A^L = \frac{1}{(A \delta + B)^2}')
-#
-## Solving the Coefficients
-#st.subheader('Solving the Coefficients')
-#st.write('From the boundary condition \( C_A^i = \frac{1}{B^2} \), we get:')
-#st.latex(r'B = \frac{1}{\sqrt{C_A^i}}')
-#st.write('Then, using \( C_A(\delta) = C_A^L \), we solve for \( A \).')
-#
-## Third-Order Reaction
-#st.header('Chapter 3: Third-Order Reaction')
-#
-## Formulation of the Problem
-#st.subheader('Formulation of the Problem')
-#st.write('For a third-order reaction, the reaction rate is proportional to the square of the concentration of species \( A \) and the concentration of species \( R \). Therefore, the rate equation is given by:')
-#st.latex(r'r_a = k_3 C_A^2 C_R')
-#st.write('Where:')
-#st.write('''
-#- \( k_3 \) is the third-order rate constant,
-#- \( C_A \) is the concentration of species \( A \),
-#- \( C_R \) is the concentration of species \( R \).
-#''')
-#
-#st.write('Assuming \( C_R \) is in excess and treated as constant, we simplify the reaction rate to:')
-#st.latex(r'r_a = k^{\prime} C_A^2 \quad \text{where} \quad k^{\prime} = k_3 C_R')
-#
-#st.write('The corresponding differential equation for the concentration profile is:')
-#st.latex(r'D_A \frac{d^2 C_A}{dx^2} - k^{\prime} C_A^2 = 0')
-#st.write('Where:')
-#st.write('''
-#- \( D_A \) is the diffusion coefficient of species \( A \),
-#- \( C_A \) is the concentration of species \( A \) as a function of position \( x \),
-#- \( k^{\prime} \) is the pseudo-third-order rate constant.
-#''')
-#
-## Attempted Analytical Solution
-#st.subheader('Attempted Analytical Solution')
-#st.write('We will attempt an analytical solution by proposing a trial solution of the form:')
-#st.latex(r'C_A(x) = \frac{1}{(A x + B)^2}')
-#
-#st.write('This is a commonly used trial solution for nonlinear differential equations of this type. Let’s substitute this into the differential equation:')
-#
-#st.latex(r'D_A \frac{d^2}{dx^2} \left( \frac{1}{(A x + B)^2} \right) - k^{\prime} \left( \frac{1}{(A x + B)^2} \right)^2 = 0')
-#
-#st.write('First, compute the second derivative of \( C_A(x) = \frac{1}{(A x + B)^2} \):')
-#st.latex(r'\frac{d}{dx} \left( \frac{1}{(A x + B)^2} \right) = \frac{-2A}{(A x + B)^3}')
-#st.latex(r'\frac{d^2}{dx^2} \left( \frac{1}{(A x + B)^2} \right) = \frac{6A^2}{(A x + B)^4}')
-#
-#st.write('Now substitute this into the differential equation:')
-#st.latex(r'D_A \frac{6A^2}{(A x + B)^4} - k^{\prime} \frac{1}{(A x + B)^4} = 0')
-#
-#st.write('Factor out the common term \( \frac{1}{(A x + B)^4} \):')
-#st.latex(r'\frac{1}{(A x + B)^4} \left( 6A^2 D_A - k^{\prime} \right) = 0')
-#
-#st.write('For this equation to hold true, the term in parentheses must equal zero:')
-#st.latex(r'6A^2 D_A - k^{\prime} = 0')
-#
-#st.write('Solving for \( A^2 \):')
-#st.latex(r'A^2 = \frac{k^{\prime}}{6D_A}')
-#st.write('Thus, \( A \) can be expressed as:')
-#st.latex(r'A = \pm \sqrt{\frac{k^{\prime}}{6D_A}}')
-#
-## Boundary Conditions
-#st.subheader('Applying the Boundary Conditions')
-#st.write('Next, we apply the boundary conditions to determine the constants \( A \) and \( B \).')
-#
-#st.write('1. At \( x = 0 \), the concentration is:')
-#st.latex(r'C_A(0) = C_A^i = \frac{1}{B^2}')
-#
-#st.write('2. At \( x = \delta \), the concentration is:')
-#st.latex(r'C_A(\delta) = C_A^L = \frac{1}{(A \delta + B)^2}')
-#
-## Solving the Coefficients
-#st.subheader('Solving the Coefficients')
-#st.write('From the boundary condition at \( x = 0 \):')
-#st.latex(r'C_A^i = \frac{1}{B^2}')
-#st.write('Solving for \( B \):')
-#st.latex(r'B = \frac{1}{\sqrt{C_A^i}}')
-#
-#st.write('Now substitute \( B \) into the boundary condition at \( x = \delta \):')
-#st.latex(r'C_A^L = \frac{1}{(A \delta + B)^2}')
-#
-#st.write('Substitute the expression for \( B \):')
-#st.latex(r'C_A^L = \frac{1}{\left( A \delta + \frac{1}{\sqrt{C_A^i}} \right)^2}')
-#
-#st.write('Now solve for \( A \) using this equation.')
-#
-## Final Solution
-#st.subheader('Final Solution for \( C_A(x) \)')
-#st.write('Thus, the concentration profile for the third-order reaction is given by:')
-#st.latex(r'''
-#C_A(x) = \frac{1}{(A x + B)^2}
-#''')
-#st.write('Where \( A \) and \( B \) are determined using the boundary conditions as shown above.')
