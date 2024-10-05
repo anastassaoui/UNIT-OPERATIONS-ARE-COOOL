@@ -1,11 +1,6 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objs as go
-from scipy.integrate import odeint
-
-
-st.set_page_config(page_title="Absence Management Dashboard", layout="wide")
-
 
 def display2():
         st.title("Chemical Kinetics and Fick's Second Law with Reaction")
