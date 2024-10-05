@@ -2,16 +2,14 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objs as go
 from scipy.integrate import odeint
+import time
 
-   
 def display1():
-
     st.title("Chemical Kinetics and Fick's Second Law")
     st.markdown("""
     ### Fick's Second Law
 
     Fick's Second Law describes diffusion and is given by:
-
     """)
     st.latex(r"""
     \frac{\partial C}{\partial t} = D \frac{\partial^2 C}{\partial x^2}
@@ -80,11 +78,26 @@ def display1():
 
     t = np.linspace(0, time_max, 500)
 
+    # Add progress bar and status text
+    progress_bar = st.sidebar.progress(0)
+    status_text = st.sidebar.empty()
+
+    # Calculate concentration based on selected reaction order
     if reaction_order == "First Order":
         C = odeint(first_order, C0, t, args=(k,))
     elif reaction_order == "Second Order":
         C = odeint(second_order, C0, t, args=(k,))
 
+    # Update progress bar to indicate completion
+    for i in range(1, 101):
+        time.sleep(0.01)  # Simulate progress delay
+        progress_bar.progress(i)
+        status_text.text(f"{i}% Complete")
+
+    # Clear the progress bar after computation is done
+    progress_bar.empty()
+
+    # Plot the data
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=t, y=C[:, 0], mode='lines', name='Concentration'))
 
@@ -97,6 +110,7 @@ def display1():
 
     st.plotly_chart(fig)
 
+    # Effect of Doubling the Initial Concentration
     st.markdown("### Effect of Doubling the Initial Concentration")
 
     C0_doubled = 2 * C0
@@ -118,3 +132,4 @@ def display1():
     )
 
     st.plotly_chart(fig2)
+
