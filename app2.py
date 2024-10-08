@@ -85,7 +85,7 @@ def display2():
     k = st.sidebar.slider("Reaction Rate Constant (k)", min_value=0.0, max_value=10.0, value=1.0)
     C0 = st.sidebar.slider("Initial Concentration (C₀)", min_value=0.1, max_value=10.0, value=1.0)
     L = st.sidebar.slider("Length of the Domain (L)", min_value=1.0, max_value=10.0, value=1.0)
-    N = st.sidebar.slider("Number of Spatial Points (N)", min_value=10, max_value=500, value=15)
+    N = st.sidebar.slider("Number of Spatial Points (N)", min_value=10, max_value=60, value=15)
     time_max = st.sidebar.slider("Maximum Time", min_value=1, max_value=100, value=10)
 
     Ha = (k * C0 * L) / D
