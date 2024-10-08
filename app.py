@@ -57,12 +57,12 @@ if page == "Home":
     col1 , col2 = st.columns([2,1])
     with col1:
         st.markdown("""
-        <h1 class="text-center text-md  font-extrabold cursor-pointer capitalize hover:text-red-400 duration-1000 md:text-5xl md:mt-20
+        <h1 class=" text-md  font-extrabold cursor-pointer capitalize hover:text-red-400 duration-1000 md:text-5xl md:mt-28
                 ">
         Welcome to our project for chemical engineering students! This tool lets you explore and visualize key unit operations.
         </h1>
 
-        <h1 class="text-center text-md  font-extrabold cursor-pointer capitalize hover:text-red-400 duration-1000 md:text-5xl 
+        <h1 class=" text-md  font-extrabold cursor-pointer capitalize hover:text-red-400 duration-1000 md:text-5xl 
                 ">
         With engaging simulations, you can deepen your understanding of essential topics such as mass transfer and thermodynamics, providing a hands-on way to apply your knowledge.
         </h1>
@@ -71,7 +71,7 @@ if page == "Home":
     
     """, unsafe_allow_html=True)
     with col2:
-        st_lottie(url1, width=500, height=500)
+        st_lottie(url1, width=600, height=600)
 
     
     
@@ -120,5 +120,5 @@ if page == "Home":
 elif page == "Fick's Second Law":
     app1.display1()
 
-elif page == "Chemical Kinetics and Fick's Second Law with Reaction":
+elif page == "Fick's Second Law Reaction":
     app2.display2()
