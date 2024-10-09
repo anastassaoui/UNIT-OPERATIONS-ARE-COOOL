@@ -15,12 +15,12 @@ def get_url(url: str):
     return r.json()
 
 url1 = get_url("https://lottie.host/b1031118-99fc-47da-8103-0d692d09c1cd/6Myzvt3heg.json")
-url2 = get_url("https://lottie.host/c21a9cff-c3f0-4cca-b335-6133fbad9533/U1NqieB2ON.json")
+url2 = get_url("https://lottie.host/b3779c13-f63c-4d67-a9bc-af6da7de7788/n2HAJr8GlV.json")
 url3 = get_url("https://lottie.host/33f398ca-7a6d-4434-97f8-4e5dbb34a625/ytJiSFcQ3s.json")  
 
 
 st.sidebar.title("Navigation",)
-page = st.sidebar.selectbox("Choose a page", ["Home", "Fick's Second Law", "Fick's Second Law Reaction"])
+page = st.sidebar.selectbox("Choose a page", ["Home", "Chemical Kinetics"])
 
 
 if page == "Home":
@@ -59,8 +59,8 @@ if page == "Home":
     with col1:
         st.markdown("""
 
-        <h4 class="text-xl font-bold mt-5 hover:text-red-400 duration-1000 cursor-pointer hover:underline md:-mb-12 md:mt-20 md:text-6xl">
-            Total Attendance Sessions 
+        <h4 class="text-xl font-extrabold mt-5 hover:text-red-400 duration-1000 cursor-pointer hover:underline md:-mb-12 md:mt-20 md:text-6xl">
+            WELCOME DEAR VISITOR!
         </h4>
 
         <p class="mb-3 text-lg  md:text-xl text-white md:mt-20 cursor-pointer">
@@ -80,12 +80,12 @@ if page == "Home":
     
     col1 , col2 = st.columns([1,2])
     with col1:
-        st_lottie(url2, width=300, height=300)
+        st_lottie(url2, width=400, height=400)
     with col2:
                 st.markdown("""
 
-    <h4 class="text-xl font-bold mt-5 hover:text-red-400 duration-1000 cursor-pointer hover:underline md:-mb-12 md:mt-20 md:text-6xl">
-        Total Attendance Sessions 
+    <h4 class="text-xl font-extrabold mt-5 hover:text-red-400 duration-1000 cursor-pointer hover:underline md:-mb-12 md:mt-20 md:text-6xl">
+        Chemical Kinetics 
     </h4>
 
     <p class="mb-3 text-lg  md:text-xl text-white md:mt-20 cursor-pointer">
@@ -159,8 +159,5 @@ if page == "Home":
     
     
     
-elif page == "Fick's Second Law":
+elif page == "Chemical Kinetics":
     app1.display1()
-
-elif page == "Fick's Second Law Reaction":
-    app2.display2()

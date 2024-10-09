@@ -1,62 +1,99 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
 import plotly.graph_objs as go
 from scipy.integrate import odeint
 import time
 
 def display1():
-    st.title("Chemical Kinetics and Fick's Second Law")
-    st.markdown("""
-    ### Fick's Second Law
-
-    Fick's Second Law describes diffusion and is given by:
-    """)
+    st.title("Chemical Kinetics")
+    
     st.latex(r"""
-    \frac{\partial C}{\partial t} = D \frac{\partial^2 C}{\partial x^2}
-    """)
-    st.markdown("""
-    Where:
-    - \( C \) is the concentration,
-    - \( t \) is time,
-    - \( D \) is the diffusion coefficient,
-    - \( x \) is the spatial coordinate.
-    """)
-
-    st.markdown("""
-    ### Reaction Orders
-
-    The rate of a chemical reaction can depend on the concentration of reactants in different ways, known as reaction orders.
-
-    **First-Order Reactions:**
-
-    Rate law:
-    """)
+        \textbf{Chemical Kinetics: Reaction Rates and Orders}
+        """)
+    
     st.latex(r"""
-    \text{Rate} = -\frac{d[A]}{dt} = k[A]
-    """)
-
-    st.markdown("""
-    Differential equation:
-    """)
+        \text{Chemical kinetics deals with the speed or rate at which chemical reactions occur.}
+        """)
+    
     st.latex(r"""
-    \frac{d[A]}{dt} = -k[A]
-    """)
+        \text{The rate of a chemical reaction depends on the concentration of the reactants and the rate constant, } k.
+        """)
 
-    st.markdown("""
-    **Second-Order Reactions:**
-
-    Rate law:
-    """)
     st.latex(r"""
-    \text{Rate} = -\frac{d[A]}{dt} = k[A]^2
-    """)
-
-    st.markdown("""
-    Differential equation:
-    """)
+        \textbf{First-Order Reactions}
+        """)
     st.latex(r"""
-    \frac{d[A]}{dt} = -k[A]^2
-    """)
+        \text{Rate law:}
+        """)
+    st.latex(r"""
+        \text{Rate} = -\frac{d[A]}{dt} = k[A]
+        """)
+    st.latex(r"""
+        \text{The rate of a first-order reaction is directly proportional to the concentration of the reactant.}
+        """)
+    st.latex(r"""
+        \text{Differential equation:}
+        """)
+    st.latex(r"""
+        \frac{d[A]}{dt} = -k[A]
+        """)
+    st.latex(r"""
+        \text{Solution:}
+        """)
+    st.latex(r"""
+        [A](t) = [A]_0 e^{-kt}
+        """)
+
+    st.latex(r"""
+        \textbf{Second-Order Reactions}
+        """)
+    st.latex(r"""
+        \text{Rate law:}
+        """)
+    st.latex(r"""
+        \text{Rate} = -\frac{d[A]}{dt} = k[A]^2
+        """)
+    st.latex(r"""
+        \text{In a second-order reaction, the rate is proportional to the square of the concentration of the reactant.}
+        """)
+    st.latex(r"""
+        \text{Differential equation:}
+        """)
+    st.latex(r"""
+        \frac{d[A]}{dt} = -k[A]^2
+        """)
+    st.latex(r"""
+        \text{Solution:}
+        """)
+    st.latex(r"""
+        [A](t) = \frac{[A]_0}{1 + k[A]_0 t}
+        """)
+
+    st.latex(r"""
+        \textbf{Third-Order Reactions}
+        """)
+    st.latex(r"""
+        \text{Rate law:}
+        """)
+    st.latex(r"""
+        \text{Rate} = -\frac{d[A]}{dt} = k[A]^3
+        """)
+    st.latex(r"""
+        \text{The rate of a third-order reaction is proportional to the cube of the concentration of the reactant.}
+        """)
+    st.latex(r"""
+        \text{Differential equation:}
+        """)
+    st.latex(r"""
+        \frac{d[A]}{dt} = -k[A]^3
+        """)
+    st.latex(r"""
+        \text{Solution:}
+        """)
+    st.latex(r"""
+        [A](t) = \frac{[A]_0}{(1 + 2k[A]_0^2 t)^{1/2}}
+        """)
 
     def first_order(C, t, k):
         return -k * C
@@ -64,11 +101,14 @@ def display1():
     def second_order(C, t, k):
         return -k * C**2
 
+    def third_order(C, t, k):
+        return -k * C**3
+
     st.sidebar.title("Parameters")
 
     reaction_order = st.sidebar.selectbox(
         "Select Reaction Order",
-        ("First Order", "Second Order"),
+        ("First Order", "Second Order", "Third Order"),
         key='reaction_order_extended'
     )
 
@@ -87,6 +127,8 @@ def display1():
         C = odeint(first_order, C0, t, args=(k,))
     elif reaction_order == "Second Order":
         C = odeint(second_order, C0, t, args=(k,))
+    elif reaction_order == "Third Order":
+        C = odeint(third_order, C0, t, args=(k,))
 
     # Update progress bar to indicate completion
     for i in range(1, 101):
@@ -97,39 +139,87 @@ def display1():
     # Clear the progress bar after computation is done
     progress_bar.empty()
 
-    # Plot the data
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=t, y=C[:, 0], mode='lines', name='Concentration'))
 
-    fig.update_layout(
-        title='Concentration vs. Time',
-        xaxis_title='Time',
-        yaxis_title='Concentration',
-        template='plotly_dark'
-    )
 
-    st.plotly_chart(fig)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col1:
+        # Plot the data
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=t, y=C[:, 0], mode='lines', name='Concentration'))
 
-    # Effect of Doubling the Initial Concentration
-    st.markdown("### Effect of Doubling the Initial Concentration")
+        fig.update_layout(
+            title='Concentration vs. Time',
+            xaxis_title='Time',
+            yaxis_title='Concentration',
+            template='plotly_dark'
+        )
 
+        st.plotly_chart(fig)
+
+    # Calculate and compare different initial concentrations
     C0_doubled = 2 * C0
 
     if reaction_order == "First Order":
         C_doubled = odeint(first_order, C0_doubled, t, args=(k,))
     elif reaction_order == "Second Order":
         C_doubled = odeint(second_order, C0_doubled, t, args=(k,))
+    elif reaction_order == "Third Order":
+        C_doubled = odeint(third_order, C0_doubled, t, args=(k,))
+    
+    with col2:
+        fig2 = go.Figure()
+        fig2.add_trace(go.Scatter(x=t, y=C[:, 0], mode='lines', name=f'C₀ = {C0}'))
+        fig2.add_trace(go.Scatter(x=t, y=C_doubled[:, 0], mode='lines', name=f'C₀ = {C0_doubled}'))
 
-    fig2 = go.Figure()
-    fig2.add_trace(go.Scatter(x=t, y=C[:, 0], mode='lines', name=f'C₀ = {C0}'))
-    fig2.add_trace(go.Scatter(x=t, y=C_doubled[:, 0], mode='lines', name=f'C₀ = {C0_doubled}'))
+        fig2.update_layout(
+            title='Effect of Doubling Initial Concentration',
+            xaxis_title='Time',
+            yaxis_title='Concentration',
+            template='plotly_dark'
+        )
 
-    fig2.update_layout(
-        title='Effect of Doubling Initial Concentration',
-        xaxis_title='Time',
-        yaxis_title='Concentration',
-        template='plotly_dark'
-    )
+        st.plotly_chart(fig2)
 
-    st.plotly_chart(fig2)
+    rate_of_change = -k * C[:, 0] if reaction_order == "First Order" else -k * C[:, 0]**(2 if reaction_order == "Second Order" else 3)
+    half_life = np.log(2) / k if reaction_order == "First Order" else 1 / (k * C0) if reaction_order == "Second Order" else None
+    with col3:
+        fig3 = go.Figure()
+        fig3.add_trace(go.Scatter(x=t, y=rate_of_change, mode='lines', name='Rate of Change'))
 
+        fig3.update_layout(
+            title='Rate of Change of Concentration vs. Time',
+            xaxis_title='Time',
+            yaxis_title='Rate of Change',
+            template='plotly_dark'
+        )
+
+        st.plotly_chart(fig3)
+        # Create a DataFrame to display the data
+        
+
+
+    col1, col2 = st.columns([2,2])  
+    with col1:
+        
+        data = pd.DataFrame({
+            'Time': t,
+            'Concentration': C[:, 0],
+            'Rate of Change': rate_of_change,
+            'Half-Life (if applicable)': half_life if half_life else 'N/A'
+        })
+        st.write("### Concentration Data Over Time", data)
+
+        
+           
+    with col2:
+        
+        rate_data = pd.DataFrame({
+            'Time': t,
+            'Rate of Change': rate_of_change
+        })
+        st.write("### Rate of Change", rate_data)
+    
+    
+    
+if __name__ == "__main__":
+    display1()
