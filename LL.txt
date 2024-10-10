@@ -1,0 +1,87 @@
+#import streamlit as st
+#import numpy as np
+#import pandas as pd
+#import plotly.graph_objs as go
+#from scipy.integrate import odeint
+#import time
+#
+#def display1():
+#
+#
+#
+#    # Define the function to calculate number of stages (basic placeholder for now)
+#    def calculate_stages(feed_comp, solvent_comp, diluent_comp):
+#        # Placeholder for stage calculation logic (can be McCabe-Thiele method or similar)
+#        stages = (feed_comp + solvent_comp + diluent_comp) / 3  # Simple placeholder formula
+#        return round(stages, 2)
+#
+#    # Create the Streamlit UI
+#    st.title("Interactive Liquid-Liquid Extraction - Ternary Phase Diagram")
+#
+#    # Sidebar for user input
+#    st.sidebar.header("Input Parameters")
+#    feed_comp = st.sidebar.slider("Feed Composition (Solute)", min_value=0.0, max_value=1.0, value=0.5)
+#    solvent_comp = st.sidebar.slider("Solvent Composition", min_value=0.0, max_value=1.0, value=0.3)
+#    diluent_comp = st.sidebar.slider("Diluent Composition", min_value=0.0, max_value=1.0, value=0.2)
+#
+#    # Calculate the number of stages based on user input
+#    num_stages = calculate_stages(feed_comp, solvent_comp, diluent_comp)
+#
+#    # Display calculated number of stages
+#    st.sidebar.write(f"Calculated Number of Stages: {num_stages}")
+#
+#    # Adjust ternary layout: solute at top, diluent on the left, solvent on the right
+#    trace1 = go.Scatterternary(
+#        a=[0.45, 0.6, 0.7, 0.8, None, 0.33, 0.4],
+#        b=[0.55, 0.2, 0.3, 0.2, None, 0.4, 0.5],
+#        c=[0, 0.2, 0, 0, None, 0.27, 0.1],
+#        mode='lines',
+#        name='Equilibrium Curve',
+#        line=dict(width=2, color='#0000ee')
+#    )
+#
+#    # Tie lines between phases (two-phase region)
+#    trace2 = go.Scatterternary(
+#        a=[0.45, 0.6, None, 0.7, 0.5],  # Data for tie lines
+#        b=[0.55, 0.2, None, 0.3, 0.35],
+#        c=[0, 0.2, None, 0, 0.15],
+#        mode='lines',
+#        name='Tie Lines',
+#        line=dict(dash='dash', color='green')
+#    )
+#
+#    # Operating Point (where extraction happens)
+#    trace3 = go.Scatterternary(
+#        a=[feed_comp],  # Operating point based on user input
+#        b=[solvent_comp],
+#        c=[diluent_comp],
+#        mode='markers',
+#        name='Operating Point',
+#        marker=dict(symbol='x', size=12, color='red')
+#    )
+#
+#    # Define the layout of the ternary plot with axis titles
+#    layout = go.Layout(
+#        title="Ternary Phase Diagram - Liquid-Liquid Extraction",
+#        ternary=dict(
+#            sum=1,
+#            aaxis=dict(title="Solute", min=0, ticksuffix=""),
+#            baxis=dict(title="Diluent", min=0, ticksuffix=""),  # Now Diluent on the left
+#            caxis=dict(title="Solvent", min=0, ticksuffix="")  # Now Solvent on the right
+#        )
+#    )
+#
+#    # Create the figure with the traces
+#    fig = go.Figure(data=[trace1, trace2, trace3], layout=layout)
+#
+#    # Display plot using Streamlit
+#    st.plotly_chart(fig)
+#
+#
+#
+#
+#
+#
+#
+#if __name__ == "__main__":
+#    display1()

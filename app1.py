@@ -3,48 +3,102 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 from scipy.integrate import odeint
+from streamlit_lottie import st_lottie
+import requests
 import time
 
+
+
+def get_url(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+url1 = get_url("https://lottie.host/01168c02-1c9e-493e-85f2-343c86c43950/fkBauqcPOH.json")
+url2 = get_url("https://lottie.host/c8ce4ada-d2f8-42f8-ab21-689abf4e9aae/3yeact3Hyb.json")
+
+
 def display1():
-    st.title("Chemical Kinetics")
     
-    st.latex(r"""
-        \textbf{Chemical Kinetics: Reaction Rates and Orders}
-        """)
+    ###################################tailwind stuff##############################################
+    tailwind_cdn = """
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            /* Center the table header and cell content */
+            .css-1q8dd3e.e1ewe7hr3 th, .css-1q8dd3e.e1ewe7hr3 td {
+                text-align: center !important;
+            }
+        </style>
+    """
+    st.markdown(tailwind_cdn, unsafe_allow_html=True)
     
-    st.latex(r"""
-        \text{Chemical kinetics deals with the speed or rate at which chemical reactions occur.}
-        """)
+    ##############################################################################################
     
-    st.latex(r"""
-        \text{The rate of a chemical reaction depends on the concentration of the reactants and the rate constant, } k.
-        """)
+    
+    #############################################Title###########################################
+    col1,col2,col3 = st.columns([1,3,1])
+    with col1:
+        st_lottie(url1, width=300, height=300)
+    with col2:
+        st.markdown("""
+        
+        <h1 class="text-3xl  text-center font-extrabold mt-10 md:text-7xl
+                    cursor-pointer md:text-7xl md:font-extrabold
+                    mb-10 hover:text-red-400 duration-1000 md:mt-20
+                    ">
+                     Chemical 
+                    <span class="bg-red-100 text-red-600 md:text-6xl mt-2 text-3xl font-extrabold me-2 px-2.5 py-0.5 rounded dark:bg-red-400 dark:text-red-800 ms-2
+                    hover:scale-125">
+                        Kinetics!
+                    </span>
+        </h1>
 
-    st.latex(r"""
-        \textbf{First-Order Reactions}
-        """)
-    st.latex(r"""
-        \text{Rate law:}
-        """)
-    st.latex(r"""
-        \text{Rate} = -\frac{d[A]}{dt} = k[A]
-        """)
-    st.latex(r"""
-        \text{The rate of a first-order reaction is directly proportional to the concentration of the reactant.}
-        """)
-    st.latex(r"""
-        \text{Differential equation:}
-        """)
-    st.latex(r"""
-        \frac{d[A]}{dt} = -k[A]
-        """)
-    st.latex(r"""
-        \text{Solution:}
-        """)
-    st.latex(r"""
-        [A](t) = [A]_0 e^{-kt}
-        """)
 
+        """, unsafe_allow_html=True)
+    with col3:
+        st_lottie(url1, width=300, height=300)
+    ########################################################################################
+    
+    
+
+    st.markdown("""
+
+        <h4 class="text-xl font-extrabold mt-5 hover:text-red-400 duration-1000 cursor-pointer hover:underline md:-mb-12 md:mt-20 md:text-4xl">
+            Chemical Kinetics Deals With The Speed Or Rate At Which Chemical Reactions Occur:
+        </h4>
+        <p class="mb-3 text-lg  md:text-xl text-white md:mt-20 cursor-pointer">
+            The rate of a chemical reaction depends on reactant concentration and the rate constant. The reaction rate increases with higher concentrations and is influenced by temperature, catalysts, and activation energy. The Arrhenius equation links temperature to the rate constant, showing how molecular collisions affect reaction speed, making it essential to optimize conditions in chemical processes.
+        </p>
+        """, unsafe_allow_html=True)
+    col1,col2 = st.columns([2,1])
+    with col1:
+        st.latex(r"""
+            \textbf{First-Order Reactions}
+            """)
+
+        st.latex(r"""
+            \text{Rate} = -\frac{d[A]}{dt} = k[A]
+            """)
+        st.latex(r"""
+            \text{Rate of a first-order reaction is directly proportional to the concentration.}
+            """)
+        st.latex(r"""
+            \text{Differential equation:}
+            """)
+        st.latex(r"""
+            \frac{d[A]}{dt} = -k[A]
+            """)
+        st.latex(r"""
+            \text{Solution:}
+            """)
+        st.latex(r"""
+            [A](t) = [A]_0 e^{-kt}
+            """)
+    with col2:
+        st_lottie(url2, width=400, height=400)
+        
     st.latex(r"""
         \textbf{Second-Order Reactions}
         """)

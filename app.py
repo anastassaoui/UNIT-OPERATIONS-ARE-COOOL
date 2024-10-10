@@ -24,6 +24,7 @@ page = st.sidebar.selectbox("Choose a page", ["Home", "Chemical Kinetics"])
 
 
 if page == "Home":
+    #############tailwind stuff##############################################
     tailwind_cdn = """
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +36,7 @@ if page == "Home":
         </style>
     """
     st.markdown(tailwind_cdn, unsafe_allow_html=True)
-    
+    ###########################################################################
     
 
     st.markdown("""
