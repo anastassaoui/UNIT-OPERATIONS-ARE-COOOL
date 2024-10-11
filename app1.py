@@ -286,22 +286,40 @@ def display1():
         
 
 
-    col1, col2 = st.columns([4,2])  
-    with col1:
-        data = pd.DataFrame({
-            'Time': t,
-            'Concentration': C[:, 0],
-            'Rate of Change': rate_of_change,
-            'Normalized Concentration': C[:, 0] / C0,
-            'Cumulative Change': np.cumsum(np.diff(C[:, 0], prepend=C0)),
-            'Half-Life (if applicable)': half_life if half_life else 'N/A'
-        })
-        st.write("### Concentration Data Over Time", data)
-    with col2:
-        st_lottie(url5, width=400, height=450)
+
+
+    # Create the DataFrame with added columns
+    reaction_rate = k * C[:, 0] if reaction_order == "First Order" else k * C[:, 0]**(2 if reaction_order == "Second Order" else 3)
+    relative_rate_of_change = rate_of_change / C0
+    reaction_quotient = (C0 - C[:, 0]) / C[:, 0] #A -> B reaction
+    log_concentration = np.log(C[:, 0])
+    data = pd.DataFrame({
+    'Time': t,
+    'Concentration': C[:, 0],
+    'Rate of Change': rate_of_change,
+    'Normalized Concentration': C[:, 0] / C0,
+    'Cumulative Change': np.cumsum(np.diff(C[:, 0], prepend=C0)),
+    'Half-Life': half_life if half_life else 'N/A',
+    'Relative Rate of Change': relative_rate_of_change,
+    'Reaction Quotient (Q)': reaction_quotient,
+    'Logarithm of Concentration': log_concentration
+    })
+
+    # Column selection with multiselect
+    selected_columns = st.multiselect(
+        "Select what to display:",
+        options=data.columns.tolist(),
+        default=data.columns.tolist()
+    )
+
+    # Display the selected columns in a dataframe
+    st.write("### Concentration Data Over Time")
+    st.dataframe(data[selected_columns], use_container_width=True)
+           
+
         
         
-    col1,col2 = st.columns([2,2])
+    col1,col2,col3 = st.columns([2,1,2])
     with col1:
         fig3 = go.Figure()
         fig3.add_trace(go.Scatter(x=t, y=rate_of_change, mode='lines', name='Rate of Change'))
@@ -313,13 +331,13 @@ def display1():
         )
         st.plotly_chart(fig3)
 
-    with col2:
+    with col3:
         fig6 = go.Figure()
 
         fig6.add_trace(go.Scatter(x=C[:, 0], y=rate_of_change, mode='lines', name='Phase Plot'))
 
         fig6.update_layout(
-            title='Phase Plot: Concentration vs Rate of Change',
+            title='Concentration vs Rate of Change',
             xaxis_title='Concentration',
             yaxis_title='Rate of Change',
             template='plotly_dark'
@@ -327,6 +345,8 @@ def display1():
 
         st.plotly_chart(fig6)
 
+    with col2:
+        st_lottie(url5, width=200, height=500)
 
     
 if __name__ == "__main__":
