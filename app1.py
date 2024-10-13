@@ -6,7 +6,8 @@ from scipy.integrate import odeint
 from streamlit_lottie import st_lottie
 import requests
 import time
-
+import base64
+import os
 
 
 def get_url(url: str):
@@ -195,7 +196,7 @@ def display1():
 
     # Update progress bar
     for i in range(1, 101):
-        time.sleep(0.1)  #progress delay
+        time.sleep(0.01)  #progress delay
         progress_bar.progress(i)
         status_text.text(f"{i}% Complete")
 
@@ -348,6 +349,51 @@ def display1():
     with col2:
         st_lottie(url5, width=200, height=500)
 
+    
+    
+    
+
+    
+
+    # Function to display PDF in the app
+    def display_pdf(file_path):
+        with open(file_path, "rb") as f:
+            base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1000" height="1000" type="application/pdf"></iframe>'
+        st.markdown(pdf_display, unsafe_allow_html=True)
+
+    # Path to the PDF file in the 'pdfs' folder
+    pdf_file_path = os.path.join("pdfs", "sample.pdf")
+
+    st.markdown("""
+        
+        <h1 class="text-3xl  text-center font-extrabold mt-6 md:mb-10 md:text-7xl
+                    cursor-pointer md:text-7xl md:font-extrabold
+                    mb-10 hover:text-red-400 duration-1000 md:mt-20
+                    ">
+                     FuLL
+                    <span class="bg-red-100 text-red-600 md:text-6xl mt-2 text-3xl font-extrabold me-2 px-2.5 py-0.5 rounded dark:bg-red-400 dark:text-red-800 ms-2
+                    hover:scale-125">
+                        DOCUMENTATION!
+                    </span>
+        </h1>
+
+
+        """, unsafe_allow_html=True)
+    
+    # Ensure the PDF exists before trying to display or allow download
+    if os.path.exists(pdf_file_path):
+        display_pdf(pdf_file_path)
+        
+    else:
+        st.error(f"PDF file not found: {pdf_file_path}")
+
+
+
+    
+    
+    
+    
     
 if __name__ == "__main__":
     display1()
