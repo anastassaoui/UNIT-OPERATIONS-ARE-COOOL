@@ -366,21 +366,11 @@ def display1():
     <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 md:-mt-7">
     """, unsafe_allow_html=True)    
     
-    pdf_url = "https://raw.githubusercontent.com/anastassaoui/UNIT-OPERATIONS-ARE-COOOL/main/pdfs/sample.pdf"
-    # Function to display PDF in the app using base64
-    def display_pdf_as_base64(pdf_url):
-        # Fetch the PDF from the URL
-        pdf_response = requests.get(pdf_url)
-        if pdf_response.status_code == 200:
-            # Encode the PDF as base64
-            base64_pdf = base64.b64encode(pdf_response.content).decode('utf-8')
-            # Embed the PDF in an iframe
-            pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1000" height="1000" type="application/pdf"></iframe>'
-            st.markdown(pdf_display, unsafe_allow_html=True)
-        else:
-            st.error("Error loading PDF from the URL.")
-
-    display_pdf_as_base64(pdf_url)
+    # Google Drive embeddable URL for the PDF
+    pdf_url = "https://drive.google.com/file/d/1InJd_GbkjPPZWJCaaqv3VvAmhNAqC_0G/preview"
+    
+    # Embed the Google Drive PDF in an iframe
+    st.markdown(f'<iframe src="{pdf_url}" width="1000" height="1000"></iframe>', unsafe_allow_html=True)
 
 
 
