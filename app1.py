@@ -351,46 +351,39 @@ def display1():
 
     
     
-    
-
-    
-
-    # Function to display PDF in the app
-    def display_pdf(file_path):
-        with open(file_path, "rb") as f:
-            base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1000" height="1000" type="application/pdf"></iframe>'
-        st.markdown(pdf_display, unsafe_allow_html=True)
-
-    # Path to the PDF file in the 'pdfs' folder
-    pdf_file_path = os.path.join("pdfs", "sample.pdf")
-
     st.markdown("""
-        
-        <h1 class="text-3xl  text-center font-extrabold mt-6 md:mb-10 md:text-7xl
-                    cursor-pointer md:text-7xl md:font-extrabold
-                    mb-10 hover:text-red-400 duration-1000 md:mt-20
-                    ">
-                     FuLL
-                    <span class="bg-red-100 text-red-600 md:text-6xl mt-2 text-3xl font-extrabold me-2 px-2.5 py-0.5 rounded dark:bg-red-400 dark:text-red-800 ms-2
-                    hover:scale-125">
-                        DOCUMENTATION!
-                    </span>
-        </h1>
-
-
-        """, unsafe_allow_html=True)
+    <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 md:-mb-12">          
+    <h1 class="text-3xl  text-center font-extrabold mt-10 md:text-5xl
+                cursor-pointer md:text-7xl md:font-extrabold
+                mb-10 hover:text-red-400 duration-1000
+                ">
+                CHECK OUT
+                <span class="bg-red-100 text-red-600 md:text-6xl mt-2 text-3xl font-extrabold me-2 px-2.5 py-0.5 rounded dark:bg-red-400 dark:text-red-800 ms-2
+                hover:scale-125">
+                    DOCUMENTATION!
+                </span>
+    </h1>
+    <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 md:-mt-7">
+    """, unsafe_allow_html=True)    
     
-    # Ensure the PDF exists before trying to display or allow download
-    if os.path.exists(pdf_file_path):
-        display_pdf(pdf_file_path)
-        
-    else:
-        st.error(f"PDF file not found: {pdf_file_path}")
+    pdf_url = "https://raw.githubusercontent.com/anastassaoui/UNIT-OPERATIONS-ARE-COOOL/main/pdfs/sample.pdf"
+    # Function to display PDF in the app using base64
+    def display_pdf_as_base64(pdf_url):
+        # Fetch the PDF from the URL
+        pdf_response = requests.get(pdf_url)
+        if pdf_response.status_code == 200:
+            # Encode the PDF as base64
+            base64_pdf = base64.b64encode(pdf_response.content).decode('utf-8')
+            # Embed the PDF in an iframe
+            pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1000" height="1000" type="application/pdf"></iframe>'
+            st.markdown(pdf_display, unsafe_allow_html=True)
+        else:
+            st.error("Error loading PDF from the URL.")
+
+    display_pdf_as_base64(pdf_url)
 
 
 
-    
     
     
     
