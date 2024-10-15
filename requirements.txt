@@ -3,3 +3,5 @@ scipy
 plotly
 numpy
 streamlit_lottie
+torch
+transformers

@@ -6,8 +6,14 @@ from scipy.integrate import odeint
 from streamlit_lottie import st_lottie
 import requests
 import time
-import base64
-import os
+from transformers import pipeline
+
+
+
+
+
+
+
 
 
 def get_url(url: str):
@@ -24,7 +30,48 @@ url5 = get_url("https://lottie.host/ba08f5b8-8d62-4c39-9cd9-80b3b7c2ed13/EYPiFLU
 
 
 def display1():
+    @st.cache_resource  # Cache the model to avoid reloading it each time
+    def load_model():
+        try:
+            # Using a question-answering pipeline (DistilBERT)
+            generator = pipeline('question-answering', model='distilbert-base-cased-distilled-squad')
+            return generator
+        except Exception as e:
+            st.error(f"Error loading the model: {e}")
+            return None
 
+    # Function to generate an answer using the context and question
+    def generate_text(prompt, model):
+        context = (
+            "Chemical kinetics is the study of reaction rates, which depend on factors such as concentrations, temperature, and catalysts. "
+            "The rate of a reaction is often expressed through rate laws. For example, a first-order reaction has the form Rate = k[A], "
+            "where k is the rate constant. For a second-order reaction, Rate = k[A]^2, and so on. "
+            "The Arrhenius equation links the rate constant to the activation energy (Ea): k = A * exp(-Ea / (R * T)), "
+            "where A is the frequency factor, R is the gas constant, and T is temperature. "
+            "In first-order reactions, the half-life (t1/2) is independent of concentration: t1/2 = ln(2)/k. "
+            "In second-order reactions, the half-life is inversely proportional to the initial concentration: t1/2 = 1/(k[A0]). "
+            "Catalysts reduce the activation energy, accelerating the reaction. Now, based on this, answer the following question: "
+            "In industrial chemistry, the decomposition of hydrogen peroxide (H2O2) into water and oxygen is catalyzed by iodide ions. "
+            "This reaction follows a first-order rate law with respect to H2O2: Rate = k[H2O2]. "
+            "For another example, the reaction between nitrogen dioxide (NO2) and carbon monoxide (CO) follows a second-order rate law: "
+            "Rate = k[NO2]^2. "
+            "The Arrhenius equation is often used to determine how temperature affects the rate constant: "
+            "k = A * exp(-Ea / (R * T)), where Ea is the activation energy, A is the frequency factor, and T is the temperature in Kelvin. "
+            "Now, based on this context, answer the following question: "
+        )
+
+
+        try:
+            response = model({
+                'question': prompt,
+                'context': context
+            })
+            return response['answer']
+        except Exception as e:
+            return f"Error generating response: {e}"
+    
+    
+    
     tailwind_cdn = """
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -368,13 +415,26 @@ def display1():
     
     # Google Drive embeddable URL for the PDF
     pdf_url = "https://drive.google.com/file/d/1InJd_GbkjPPZWJCaaqv3VvAmhNAqC_0G/preview"
-    
-    # Embed the Google Drive PDF in an iframe
+        # Embed the Google Drive PDF in an iframe
     st.markdown(f'<iframe src="{pdf_url}" width="1000" height="1000"></iframe>', unsafe_allow_html=True)
 
+    # Load the Hugging Face model
+    model = load_model()
+    if model:
+        st.sidebar.title("AI Assistant")
+        # Text input for user prompt
+        user_prompt = st.sidebar.text_area("Ask a question about chemical kinetics:")
+        if st.sidebar.button("Generate Response"):
+            if user_prompt:
+                # Get AI-generated response
+                ai_response = generate_text(user_prompt, model)
+                st.sidebar.write("### AI Response:")
+                st.sidebar.write(ai_response)
+            else:
+                st.sidebar.write("Please enter a question.")
+    else:
+        st.sidebar.error("Model could not be loaded. Check your internet connection or environment settings.")
 
-
-    
     
     
     
