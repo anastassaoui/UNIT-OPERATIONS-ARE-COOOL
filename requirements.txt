@@ -5,4 +5,4 @@ numpy
 streamlit_lottie
 langchain_groq
 langchain_core
-dotenv
+python-dotenv
