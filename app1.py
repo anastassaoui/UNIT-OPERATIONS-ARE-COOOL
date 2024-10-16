@@ -52,28 +52,7 @@ def display1():
         """
         return context
 
-    st.markdown("## Ask the AI a question about the chemical kinetics data")
-    
-    # User input for Groq AI query
-    user_question = st.text_input("Type your question here")
-    
-    if user_question:
-        # Generate the context for the question
-        context = generate_context()
 
-        # Create the system and user messages
-        system_message = SystemMessage(content="The context of the chemical kinetics application is provided.")
-        user_message = HumanMessage(content=user_question)
-        
-        # Invoke the LLM model
-        result = llm.invoke([system_message, user_message])
-        
-        # Parse the result
-        parser = StrOutputParser()
-        parsed_result = parser.invoke(result)
-        
-        # Display the result
-        st.write(f"AI's response: {parsed_result}")
  
     
     tailwind_cdn = """
@@ -422,7 +401,28 @@ def display1():
         # Embed the Google Drive PDF in an iframe
     st.markdown(f'<iframe src="{pdf_url}" width="1000" height="1000"></iframe>', unsafe_allow_html=True)
 
+    st.markdown("## Ask the AI a question about the chemical kinetics data")
+    
+    # User input for Groq AI query
+    user_question = st.text_input("Type your question here")
+    
+    if user_question:
+        # Generate the context for the question
+        context = generate_context()
 
+        # Create the system and user messages
+        system_message = SystemMessage(content="The context of the chemical kinetics application is provided.")
+        user_message = HumanMessage(content=user_question)
+        
+        # Invoke the LLM model
+        result = llm.invoke([system_message, user_message])
+        
+        # Parse the result
+        parser = StrOutputParser()
+        parsed_result = parser.invoke(result)
+        
+        # Display the result
+        st.write(f"AI's response: {parsed_result}")
 
     
 if __name__ == "__main__":
