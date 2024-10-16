@@ -3,5 +3,6 @@ scipy
 plotly
 numpy
 streamlit_lottie
-torch
-transformers
+langchain_groq
+langchain_core
+dotenv
