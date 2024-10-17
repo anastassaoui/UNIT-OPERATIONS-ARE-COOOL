@@ -1,24 +1,27 @@
+import requests
+import time
+import os
 import streamlit as st
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 from scipy.integrate import odeint
 from streamlit_lottie import st_lottie
-import requests
-import time
-import os
 from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
+#from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.runnables import RunnableSequence
+#from langchain_core.runnables import RunnableSequence
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
 
 load_dotenv()
 
-# Initialize the Groq API key from .env file
-groq_api_key = os.getenv("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")
+groq_api_key = os.getenv("GROQ_API_KEY")
+
+if not groq_api_key:
+    raise ValueError("Groq API key not found. Make sure it's defined in the .env file.")
+
 llm = ChatGroq(model="llama3-8b-8192", groq_api_key=groq_api_key)
 
 
@@ -45,15 +48,6 @@ url5 = get_url("https://lottie.host/ba08f5b8-8d62-4c39-9cd9-80b3b7c2ed13/EYPiFLU
 
 
 def display1():
-
-    def generate_context():
-        context = f"""
-        The application calculates chemical reaction kinetics for first-order, second-order, and third-order reactions.
-        """
-        return context
-
-
- 
     
     tailwind_cdn = """
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -210,7 +204,7 @@ def display1():
     C0 = st.sidebar.slider("Initial Concentration (C₀)", min_value=0.001, max_value=50.0, value=1.0)
     time_max = st.sidebar.slider("Maximum Time", min_value=1, max_value=100, value=50)
 
-    t = np.linspace(0, time_max, 400)
+    t = np.linspace(0, time_max, 80)
 
     #progress bar
     progress_bar = st.sidebar.progress(0)
@@ -401,28 +395,53 @@ def display1():
         # Embed the Google Drive PDF in an iframe
     st.markdown(f'<iframe src="{pdf_url}" width="1000" height="1000"></iframe>', unsafe_allow_html=True)
 
-    st.markdown("## Ask the AI a question about the chemical kinetics data")
-    
-    # User input for Groq AI query
-    user_question = st.text_input("Type your question here")
-    
-    if user_question:
-        # Generate the context for the question
-        context = generate_context()
 
-        # Create the system and user messages
-        system_message = SystemMessage(content="The context of the chemical kinetics application is provided.")
+    st.markdown("""
+  
+    <h1 class="text-3xl  text-center font-extrabold mt-10 md:text-4xl
+                cursor-pointer md:text-7xl md:font-extrabold
+                mb-10 hover:text-red-400 duration-1000 md:mt-20
+                ">
+                Ask the AI a question about the 
+                <span class="bg-red-100 text-red-600 md:text-6xl mt-2 text-3xl font-extrabold me-2 px-2.5  rounded dark:bg-red-400 dark:text-red-800 ms-2 
+                hover:scale-125">
+                    chemical kinetics data
+                </span>
+    </h1>
+    <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 md:-mt-7">
+    """, unsafe_allow_html=True)    
+    
+    
+
+
+    user_question = st.text_input("")
+
+    if user_question:
+        # Convert DataFrame to a string summary for the AI to process
+        data_summary = data.iloc[:80, :].to_csv(index=False)
+
+        # Generate the context for the question including the data summary
+        context = f"""
+        The following chemical kinetics data has been calculated:
+        {data_summary}
+        Analyze this data and answer the user's question.
+        """
+
+        #system message
+        system_message = SystemMessage(content=context)
+
+        #human message
         user_message = HumanMessage(content=user_question)
-        
-        # Invoke the LLM model
+
         result = llm.invoke([system_message, user_message])
-        
-        # Parse the result
+
+        # Parse
         parser = StrOutputParser()
         parsed_result = parser.invoke(result)
-        
-        # Display the result
-        st.write(f"AI's response: {parsed_result}")
+
+        # Display
+        st.code(parsed_result, language='python')  # Change the language as needed
+
 
     
 if __name__ == "__main__":
