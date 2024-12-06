@@ -118,47 +118,7 @@ if page == "Home":
     
     """, unsafe_allow_html=True)
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+     
     
 elif page == "Chemical Kinetics":
     app1.display1()

@@ -7,10 +7,9 @@ import pandas as pd
 import plotly.graph_objs as go
 from scipy.integrate import odeint
 from streamlit_lottie import st_lottie
+from mitosheet.streamlit.v1 import spreadsheet 
 from langchain_groq import ChatGroq
-#from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
-#from langchain_core.runnables import RunnableSequence
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
@@ -179,9 +178,6 @@ def display1():
         st_lottie(url4, width=400, height=450)
 
     ##😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️
-    ##😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️
-    ##😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️
-    ##😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️😊😘😂😊💕😁😁👌💕😁❤️👌😁🤦‍♂️😎😉🤷‍♂️
 
     def first_order(C, t, k):
         return -k * C
@@ -318,28 +314,37 @@ def display1():
     relative_rate_of_change = rate_of_change / C0
     reaction_quotient = (C0 - C[:, 0]) / C[:, 0] #A -> B reaction
     log_concentration = np.log(C[:, 0])
+    
+    # Original DataFrame
     data = pd.DataFrame({
-    'Time': t,
-    'Concentration': C[:, 0],
-    'Rate of Change': rate_of_change,
-    'Normalized Concentration': C[:, 0] / C0,
-    'Cumulative Change': np.cumsum(np.diff(C[:, 0], prepend=C0)),
-    'Half-Life': half_life if half_life else 'N/A',
-    'Relative Rate of Change': relative_rate_of_change,
-    'Reaction Quotient (Q)': reaction_quotient,
-    'Logarithm of Concentration': log_concentration
+        'Time': t,
+        'Concentration': C[:, 0],
+        'Rate of Change': rate_of_change,
+        'Normalized Concentration': C[:, 0] / C0,
+        'Cumulative Change': np.cumsum(np.diff(C[:, 0], prepend=C0)),
+        'Half-Life': half_life if half_life else 'N/A',
+        'Relative Rate of Change': relative_rate_of_change,
+        'Reaction Quotient (Q)': reaction_quotient,
+        'Logarithm of Concentration': log_concentration
     })
 
-    # Column selection with multiselect
+    # Use Mito Spreadsheet for Data Manipulation
+    st.markdown("### Edit and Explore the Data with Mito Spreadsheet")
+    final_dfs, code = spreadsheet(data)  # Initialize `final_dfs` with Mito
+
+    # Allow user to select columns to display
     selected_columns = st.multiselect(
-        "Select what to display:",
-        options=data.columns.tolist(),
-        default=data.columns.tolist()
+        "Select columns to display:",
+        options=final_dfs.columns.tolist(),
+        default=final_dfs.columns.tolist()
     )
 
-    # Display the selected columns in a dataframe
-    st.write("### Concentration Data Over Time")
-    st.dataframe(data[selected_columns], use_container_width=True)
+    # Display the edited DataFrame
+    st.markdown("### Edited DataFrame")
+    st.dataframe(final_dfs[selected_columns], use_container_width=True)
+    
+
+
            
 
         
@@ -440,7 +445,7 @@ def display1():
         parsed_result = parser.invoke(result)
 
         # Display
-        st.code(parsed_result, language='python')  # Change the language as needed
+        st.code(parsed_result, language='python')  
 
 
     

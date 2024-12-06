@@ -6,3 +6,4 @@ streamlit_lottie
 langchain_groq
 langchain_core
 python-dotenv
+mitosheet.streamlit.v1
